@@ -367,6 +367,11 @@ void caml_init_gc (void)
 */
 }
 
+void caml_free_gc (void)
+{
+  caml_free_domains();
+}
+
 /* FIXME After the startup_aux.c unification, move these functions there. */
 
 CAMLprim value caml_runtime_variant (value unit)

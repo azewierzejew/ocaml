@@ -885,6 +885,14 @@ void caml_init_domains(uintnat minor_heap_wsz) {
   caml_domain_set_name("Domain");
 }
 
+static void domain_terminate();
+
+void caml_free_domains(void) {
+  caml_free_signal_handling();
+
+  domain_terminate();
+}
+
 void caml_init_domain_self(int domain_id) {
   CAMLassert (domain_id >= 0 && domain_id < Max_domains);
   domain_self = &all_domains[domain_id];
@@ -1056,7 +1064,6 @@ CAMLexport void (*caml_domain_stop_hook)(void) =
 CAMLexport void (*caml_domain_external_interrupt_hook)(void) =
    caml_domain_external_interrupt_hook_default;
 
-static void domain_terminate();
 
 static void* domain_thread_func(void* v)
 {

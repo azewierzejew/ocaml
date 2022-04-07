@@ -25,6 +25,7 @@ extern uintnat caml_fiber_wsz;
 extern uintnat caml_major_cycles_completed;
 
 void caml_init_gc (void);
+void caml_free_gc (void);
 value caml_gc_stat(value);
 value caml_gc_major(value);
 
