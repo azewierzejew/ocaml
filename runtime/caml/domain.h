@@ -75,6 +75,7 @@ CAMLextern void (*caml_domain_external_interrupt_hook)(void);
 
 CAMLextern void caml_init_domains(uintnat minor_heap_wsz);
 CAMLextern void caml_init_domain_self(int);
+CAMLextern void caml_free_domains(void);
 
 CAMLextern uintnat caml_minor_heap_max_wsz;
 

@@ -180,6 +180,44 @@ void caml_init_signal_handling(void) {
   caml_register_generational_global_root(&caml_signal_handlers);
 }
 
+static void handle_signal(int signal_number);
+
+void caml_free_signal_handling(void) {
+  mlsize_t i;
+#ifdef POSIX_SIGNALS
+  struct sigaction sigact, oldsigact;
+#else
+  void (*oldact)(int signo);
+#endif
+
+#ifdef POSIX_SIGNALS
+  sigact.sa_handler = SIG_DFL;
+  sigemptyset(&sigact.sa_mask);
+  sigact.sa_flags = 0;
+#endif
+
+  for (i = 1; i < NSIG; i++) {
+#ifdef POSIX_SIGNALS
+    // Ignore failed sigactions because of real-time signals.
+    if (sigaction(i, 0, &oldsigact) == 0) {
+      if (!(oldsigact.sa_flags & SA_SIGINFO) && oldsigact.sa_handler == handle_signal) {
+        if (sigaction(i, &sigact, 0)) {
+          caml_fatal_error("Failed to reset signal handler to default for %zu because %d: %s",
+              i, errno, strerror(errno));
+        }
+      }
+    }
+#else
+    oldact = signal(i, SIG_DFL);
+    // Here we can't abort on SIG_ERR, because of trying to change uncatchable signals.
+    if (oldact != SIG_ERR && oldact != handle_signal) {
+      // The signal was changed, but shouldn't be. Revert change.
+      signal(i, oldact);
+    }
+#endif
+  }
+}
+
 /* Execute a signal handler immediately */
 
 value caml_execute_signal_exn(int signal_number, int in_signal_handler)

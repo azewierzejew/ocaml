@@ -73,6 +73,7 @@ value caml_process_pending_actions_with_root (value extra_root); // raises
 value caml_process_pending_actions_with_root_exn (value extra_root);
 
 void caml_init_signal_handling(void);
+void caml_free_signal_handling(void);
 int caml_init_signal_stack(void);
 void caml_free_signal_stack(void);
 
